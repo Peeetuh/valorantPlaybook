@@ -83,6 +83,10 @@ usersRouter.post("/register", async (req, res, next) => {
         expiresIn: "1y",
       }
     );
+    res.send({
+      message: "thank you for signing up",
+      token,
+    });
   } catch ({ name, message }) {
     next({ name, message });
   }

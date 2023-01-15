@@ -150,6 +150,47 @@ async function getAllPosts() {
   }
 }
 
+async function getPostById(postId) {
+  try {
+    const {
+      rows: [post],
+    } = await client.query(
+      `
+    SELECT *
+    FROM posts
+    WHERE id=$1;
+    `,
+      [postId]
+    );
+
+    if (!post) {
+      throw {
+        name: "PostNotFoundError",
+        message: "Could not find a post with that postId",
+      };
+    }
+
+    const {
+      rows: [author],
+    } = await client.query(
+      `
+    SELECT id, username
+    FROM users
+    WHERE id=$1;
+    `,
+      [post.authorId]
+    );
+
+    post.author = author;
+
+    delete post.authorId;
+
+    return post;
+  } catch (error) {
+    throw error;
+  }
+}
+
 async function getPostsByUser(userId) {
   try {
     const { rows } = await client.query(`
@@ -193,4 +234,7 @@ module.exports = {
   getPostsByUser,
   getUserById,
   getUserByUsername,
+  getPostById,
 };
+
+//patch / api / posts/:postId
